@@ -1,4 +1,4 @@
-import {cloneTemplate} from "../lib/utils.js";
+import { cloneTemplate } from "../lib/utils.js";
 
 /**
  * Инициализирует таблицу и вызывает коллбэк при любых изменениях и нажатиях на кнопки
@@ -7,19 +7,73 @@ import {cloneTemplate} from "../lib/utils.js";
  * @param {(action: HTMLButtonElement | undefined) => void} onAction
  * @returns {{container: Node, elements: *, render: render}}
  */
+// Что возвращает cloneTemplate
+// {
+//    container: <div class="table-row">,
+//    elements: {
+//       date: <div>,
+//       customer: <div>
+//    }
+// }
+//   console.log(key); total
+//   console.log(row.elements[key]); <div class="table-column" data-name="total" role="cell">1537.99</div>
+//   console.log(row.elements[key].textContent); 1537.99
+
 export function initTable(settings, onAction) {
-    const {tableTemplate, rowTemplate, before, after} = settings;
-    const root = cloneTemplate(tableTemplate);
+  const { tableTemplate, rowTemplate, before, after } = settings;
+  const root = cloneTemplate(tableTemplate);
+  // @todo: #1.2 —  вывести дополнительные шаблоны до и после таблицы
 
-    // @todo: #1.2 —  вывести дополнительные шаблоны до и после таблицы
+  before.reverse().forEach((id) => {
+    root[id] = cloneTemplate(id);
+    root.container.prepend(root[id].container);
+  });
 
-    // @todo: #1.3 —  обработать события и вызвать onAction()
+  after.forEach((id) => {
+    root[id] = cloneTemplate(id);
+    root.container.append(root[id].container);
+  });
 
-    const render = (data) => {
-        // @todo: #1.1 — преобразовать данные в массив строк на основе шаблона rowTemplate
-        const nextRows = [];
-        root.elements.rows.replaceChildren(...nextRows);
-    }
+  //   console.log(root);
+  // @todo: #1.3 —  обработать события и вызвать onAction()
 
-    return {...root, render};
+  root.container.addEventListener("change", () => {
+    onAction();
+  });
+
+  root.container.addEventListener("reset", () => {
+    setTimeout(() => {
+      onAction();
+    }, 1000);
+    onAction();
+  });
+
+  root.container.addEventListener("submit", (e) => {
+    e.preventDefault();
+    onAction(e.submitter);
+  });
+
+  const render = (data) => {
+    // @todo: #1.1 — преобразовать данные в массив строк на основе шаблона rowTemplate
+    const nextRows = [];
+
+    data.map((item) => {
+      const row = cloneTemplate(rowTemplate);
+
+      Object.keys(item).forEach((key) => {
+        if (row.elements.hasOwnProperty(key)) {
+          row.elements[key].textContent = item[key];
+          //   console.log(key);
+          //   console.log(row.elements[key]);
+          //   console.log(row.elements[key].textContent);
+        }
+      });
+
+      nextRows.push(row.container);
+    });
+
+    root.elements.rows.replaceChildren(...nextRows);
+  };
+
+  return { ...root, render };
 }
