@@ -21,12 +21,18 @@ const { data, ...indexes } = initData(sourceData);
  */
 function collectState() {
   const state = processFormData(new FormData(sampleTable.container));
-
   const rowsPerPage = parseInt(state.rowsPerPage); // приведём количество страниц к числу
   const page = parseInt(state.page ?? 1);
 
+  console.log(state);
+  const arrTotalFromTo = [];
+  arrTotalFromTo.push(state.totalFrom);
+  arrTotalFromTo.push(state.totalTo);
+  state.total = arrTotalFromTo;
+
   return {
     ...state,
+    arrTotalFromTo,
     rowsPerPage,
     page,
   };
@@ -44,7 +50,6 @@ function render(action) {
   result = applySearching(result, state, action);
   result = applyFiltering(result, state, action);
   result = applyPagination(result, state, action);
-  console.log(state);
   sampleTable.render(result);
 }
 
