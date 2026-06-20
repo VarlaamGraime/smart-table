@@ -16,7 +16,12 @@ export function initFiltering(elements) {
     if (action) {
       if (action.name === "clear") {
         const parentAction = action.parentNode;
-        parentAction.querySelector("input").value = "";
+        const input = parentAction.querySelector("input");
+
+        if (input) {
+          input.value = "";
+        }
+
         const field = action.dataset.field;
         state[field] = "";
       }
@@ -24,12 +29,26 @@ export function initFiltering(elements) {
 
     const filter = {};
     Object.keys(elements).forEach((key) => {
+      const element = elements[key];
       if (elements[key]) {
         if (
           ["INPUT", "SELECT"].includes(elements[key].tagName) &&
           elements[key].value
         ) {
-          filter[`filter[${elements[key].name}]`] = elements[key].value;
+          const name = element.name;
+          const value = element.value;
+
+          if (name === "date") {
+            const isFullDate = /^\d{4}-\d{2}-\d{2}$/.test(value);
+
+            if (isFullDate) {
+              filter[`filter[${name}]`] = value;
+            }
+
+            return;
+          }
+
+          filter[`filter[${name}]`] = value;
         }
       }
     });

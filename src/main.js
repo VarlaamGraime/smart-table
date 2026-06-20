@@ -86,13 +86,21 @@ const { applyPagination, updatePagination } = initPagination(
   },
 );
 const search = sampleTable.search.elements.search;
+const applySearching = initSearching(["search", "customer"]);
+const searchFields = [
+  sampleTable.search.elements.search,
+  sampleTable.filter.elements.searchByDate,
+  sampleTable.filter.elements.searchByCustomer,
+];
 
-const applySearching = initSearching("search");
-search.addEventListener("input", () => {
-  console.log("input:", search.value);
+searchFields.forEach((field) => {
+  field.addEventListener("input", () => {
+    render();
+  });
+});
+sampleTable.filter.elements.searchByDate.addEventListener("input", () => {
   render();
 });
-
 async function init() {
   const indexes = await api.getIndexes();
 
