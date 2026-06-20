@@ -45,13 +45,11 @@ function collectState() {
 async function render(action) {
   let state = collectState(); // состояние полей из таблицы
   let query = {};
-  // @todo: использование
-  // result = applySorting(result, state, action);
-  // result = applySearching(result, state, action);
-  // result = applyFiltering(result, state, action);
-  // result = applyPagination(result, state, action);
-  query = applyPagination(query, state, action);
+
+  query = applySearching(query, state, action);
   query = applyFiltering(query, state, action);
+  query = applySorting(query, state, action);
+  query = applyPagination(query, state, action);
   const { total, items } = await api.getRecords(query);
   updatePagination(total, query);
   sampleTable.render(items);
@@ -95,21 +93,23 @@ search.addEventListener("input", () => {
   render();
 });
 
+async function init() {
+  const indexes = await api.getIndexes();
+
+  console.log("indexes:", indexes);
+  console.log("filter elements:", sampleTable.filter.elements);
+  updateIndexes(sampleTable.filter.elements, indexes);
+}
+
 const { applyFiltering, updateIndexes } = initFiltering(
   sampleTable.filter.elements,
   {
-    searchBySeller: indexes.sellers, // для элемента с именем searchBySeller устанавливаем массив продавцов
+    seller: "seller_id",
+    customer: "customer_id",
   },
 );
 
 const appRoot = document.querySelector("#app");
 appRoot.appendChild(sampleTable.container);
-
-async function init() {
-  const indexes = await api.getIndexes();
-  {
-    (applyFiltering, updateIndexes);
-  }
-}
 
 init().then(render);

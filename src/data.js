@@ -25,7 +25,10 @@ export function initData(sourceData) {
       ]);
     }
 
-    return { sellers, customers };
+    return {
+      searchBySeller: sellers,
+      searchByCustomer: customers,
+    };
   };
 
   const getRecords = async (query, isUpdated = false) => {
