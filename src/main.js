@@ -13,7 +13,7 @@ import { initSearching } from "./components/searching.js";
 // @todo: подключение
 
 // Исходные данные используемые в render()
-const api = initData(sourceData);
+const api = initData();
 
 /**
  * Сбор и обработка полей из таблицы
@@ -86,21 +86,8 @@ const { applyPagination, updatePagination } = initPagination(
   },
 );
 const search = sampleTable.search.elements.search;
-const applySearching = initSearching(["search", "customer"]);
-const searchFields = [
-  sampleTable.search.elements.search,
-  sampleTable.filter.elements.searchByDate,
-  sampleTable.filter.elements.searchByCustomer,
-];
+const applySearching = initSearching("search");
 
-searchFields.forEach((field) => {
-  field.addEventListener("input", () => {
-    render();
-  });
-});
-sampleTable.filter.elements.searchByDate.addEventListener("input", () => {
-  render();
-});
 async function init() {
   const indexes = await api.getIndexes();
 

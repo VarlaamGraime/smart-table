@@ -1,12 +1,10 @@
-export function initSearching(searchFields) {
+export function initSearching(searchField) {
   return (query, state) => {
-    const search = searchFields
-      .map((field) => state[field])
-      .filter(Boolean)
-      .join(" ");
-
-    return search
-      ? { ...query, search }
+    return state[searchField]
+      ? {
+          ...query,
+          search: state[searchField],
+        }
       : query;
   };
 }
